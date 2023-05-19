@@ -1,9 +1,12 @@
 - [x] husky / lint-staged
 - [ ] codecov
-- [ ] finish docker-compose.yml
 - [ ] github actions
   - [x] workflow:pr 
-  - [ ] yarn cache 
-  - [ ] deploy on aws / locally (vagrant?)
+  - [x] yarn cache 
+  - [ ] deploy on e.g. aws upon merge with dev
 - [ ] playwright
+  - [ ] finish docker-compose.yml
 - [ ] switch to mono repo?
+- [ ] lint
+  - [ ] throw on TODO
+  - [ ] throw on unused vars
