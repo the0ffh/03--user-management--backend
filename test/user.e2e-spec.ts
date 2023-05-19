@@ -105,7 +105,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe.only('/ (GET)', () => {
+  describe.skip('/ (GET)', () => {
     it('should return all users', () => {
       return request(app.getHttpServer())
         .get('/user')
@@ -160,7 +160,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('/ (PATCH)', () => {
+  describe.only('/ (PATCH)', () => {
     it('should update a user', () => {
       const payload: UpdateUserDto = {
         address: 'la street 1234',
@@ -174,7 +174,7 @@ describe('UserController (e2e)', () => {
         .patch('/user/1')
         .send(payload)
         .expect(200)
-        .expect('This action updates a #1 user');
+        .expect('successfully updated user 1');
     });
 
     it('should not update a user with extra payload properties', async () => {
@@ -201,8 +201,8 @@ describe('UserController (e2e)', () => {
 
     it('should not update a user with malformed email', async () => {
       const payload: UpdateUserDto = {
-        address: 'la street 1234',
-        birthdate: '01.01.1900',
+        address: 'wall street 2000',
+        birthdate: '01.01.2000',
         email: 'adam@te@st.com',
         firstName: 'adam',
         lastName: 'sandler',

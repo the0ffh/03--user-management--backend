@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -32,8 +33,13 @@ export class UserService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      await this.userRepository.update(id, updateUserDto);
+      return `successfully updated user ${id}`;
+    } catch (error) {
+      throw new UnprocessableEntityException(`cannot update user ${id}`);
+    }
   }
 
   remove(id: number) {
