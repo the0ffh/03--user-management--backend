@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as path from 'path';
+import { UserModule } from '../user/user.module';
 
 /*
  * ConfigModule + TypeOrmModule cfg
@@ -13,11 +14,9 @@ import * as path from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-
       useFactory: async (configService: ConfigService) => ({
         type: 'mysql',
         host: configService.get('MYSQL_DATABASE_HOST'),
@@ -32,6 +31,7 @@ import * as path from 'path';
         autoLoadEntities: true,
       }),
     }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

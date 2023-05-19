@@ -20,6 +20,7 @@ export class UserController {
   create(
     @Body(
       new ValidationPipe({
+        transform: true,
         validationError: { target: true },
         whitelist: true,
         forbidNonWhitelisted: true,
@@ -36,15 +37,16 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.userService.findOne(+id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body(
       new ValidationPipe({
+        transform: true,
         validationError: { target: true },
         whitelist: true,
         forbidNonWhitelisted: true,
@@ -56,7 +58,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.userService.remove(+id);
   }
 }

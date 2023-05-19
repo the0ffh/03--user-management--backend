@@ -17,19 +17,21 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    if (await this.userRepository.findOneBy({ email: createUserDto.email }))
-      throw new ConflictException('user with provided email exists');
-    return this.userRepository.save(createUserDto);
+    if (!(await this.userRepository.findOneBy({ email: createUserDto.email })))
+      return this.userRepository.save(createUserDto);
+    throw new ConflictException('user with provided email exists');
   }
 
-  findAll() {
-    return this.userRepository.find();
+  async findAll() {
+    const users = await this.userRepository.find();
+    if (users.length) return users;
+    throw new NotFoundException('no users found');
   }
 
   async findOne(id: number) {
     const user = await this.userRepository.findOneBy({ id });
-    if (!user) throw new NotFoundException(`user ${id} not found`);
-    return user;
+    if (user) return user;
+    throw new NotFoundException(`user ${id} not found`);
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
