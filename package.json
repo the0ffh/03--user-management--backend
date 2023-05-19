@@ -22,7 +22,12 @@
     "postinstall": "husky install",
     "prepack": "pinst --disable",
     "postpack": "pinst --enable",
-    "pre-commit": "lint-staged"
+    "pre-commit": "lint-staged",
+    "typeorm": "typeorm-ts-node-commonjs -d src/data-source.ts",
+    "migration:create": "yarn typeorm migration:create",
+    "migration:generate": "yarn typeorm migration:generate",
+    "migration:run": "yarn typeorm migration:run --transaction all",
+    "start:clean": "yarn migration:run && yarn start:dev"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
