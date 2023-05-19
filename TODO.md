@@ -10,8 +10,7 @@
 - [ ] lint
   - [ ] throw on TODO
   - [ ] throw on unused vars
-  - [ ] throw on console.log
-  - [ ] warn on large comments?
+  - [x] throw on console.log
 - [ ] extract address into own table
 - [ ] use date type for birthdate
 - [ ] fix env loading!!!!
@@ -19,3 +18,5 @@
 - [ ] spin up test db for each test/suite/file
 - [ ] add fixtures *.sql seed db -> docker instead of mounting db dir
 - [ ] tests: use faker 
+- [ ] e2e: fix'em!!
+- [x] openapi / swagger
