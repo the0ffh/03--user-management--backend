@@ -19,7 +19,6 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     if (await this.userRepository.findOneBy({ email: createUserDto.email }))
       throw new ConflictException('user with provided email exists');
-
     return this.userRepository.save(createUserDto);
   }
 
@@ -42,7 +41,11 @@ export class UserService {
     }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    if (await this.userRepository.findOneBy({ id })) {
+      await this.userRepository.delete({ id });
+      return `successfully deleted user ${id}`;
+    }
+    throw new NotFoundException(`user ${id} not found`);
   }
 }

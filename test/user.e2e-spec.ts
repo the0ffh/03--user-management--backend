@@ -22,7 +22,7 @@ describe('UserController (e2e)', () => {
     await app.close();
   });
 
-  describe.skip('/ (POST)', () => {
+  describe('/ (POST)', () => {
     it('should not create a user with no payload', () => {
       return request(app.getHttpServer())
         .post('/user')
@@ -105,7 +105,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe.skip('/ (GET)', () => {
+  describe('/ (GET)', () => {
     it('should return all users', () => {
       return request(app.getHttpServer())
         .get('/user')
@@ -160,7 +160,7 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe.only('/ (PATCH)', () => {
+  describe('/ (PATCH)', () => {
     it('should update a user', () => {
       const payload: UpdateUserDto = {
         address: 'la street 1234',
@@ -221,11 +221,24 @@ describe('UserController (e2e)', () => {
   });
 
   describe('/ (DELETE)', () => {
-    it('should delete a user', () => {
+    it('should return http 404 when user not found', () => {
       return request(app.getHttpServer())
-        .delete('/user/1')
+        .delete('/user/54321')
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: 'user 54321 not found',
+              statusCode: 404,
+            }),
+          ),
+        );
+    });
+
+    it('should delete a user', async () => {
+      return request(app.getHttpServer())
+        .delete('/user/4')
         .expect(200)
-        .expect('This action removes a #1 user');
+        .expect('successfully deleted user 4');
     });
   });
 });
