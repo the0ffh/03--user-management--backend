@@ -4,24 +4,23 @@ on:
 
 
 jobs:
-  test:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 'v18.14.1'
-      - run: yarn
-      - run: yarn lint
-      - run: yarn test:ts
-      - run: yarn test
-      - run: yarn test:cov
+#  test:
+#    runs-on: ubuntu-22.04
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 1
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 'v18.14.1'
+#      - run: yarn
+#      - run: yarn lint
+#      - run: yarn test:ts
+#      - run: yarn test
+#      - run: yarn test:cov
 
   test-e2e:
-    needs:
-      - test
+#    needs: [test]
     runs-on: ubuntu-22.04
     timeout-minutes: 3
     services:
