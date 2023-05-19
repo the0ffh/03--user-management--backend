@@ -1,0 +1,48 @@
+name: pull request
+on:
+  pull_request
+
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'v18.14.1'
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn lint
+      - run: yarn test:ts
+      - run: yarn test
+      - run: yarn test:cov
+
+  test-e2e:
+#    needs: [test]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 3
+    services:
+      mysql:
+        image: bitnami/mysql
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+          MYSQL_DATABASE: devdb
+          MYSQL_USER: dev
+          MYSQL_PASSWORD: devpw
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 'v18.14.1'
+          cache: 'yarn'
+      - run: yarn
+      - run: yarn test:e2e
