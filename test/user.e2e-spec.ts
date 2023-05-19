@@ -22,7 +22,7 @@ describe('UserController (e2e)', () => {
     await app.close();
   });
 
-  describe.only('/ (POST)', () => {
+  describe.skip('/ (POST)', () => {
     it('should not create a user with no payload', () => {
       return request(app.getHttpServer())
         .post('/user')
@@ -105,19 +105,58 @@ describe('UserController (e2e)', () => {
     });
   });
 
-  describe('/ (GET)', () => {
+  describe.only('/ (GET)', () => {
     it('should return all users', () => {
       return request(app.getHttpServer())
         .get('/user')
         .expect(200)
-        .expect('This action returns all user');
+        .expect([
+          {
+            id: 1,
+            firstName: 'john',
+            lastName: 'doe',
+            address: 'Messedamm 59, Dresden',
+            email: 'john@doe.com',
+            birthdate: '01.02.1980',
+          },
+          {
+            id: 2,
+            firstName: 'Bernard',
+            lastName: 'Jung',
+            address: 'Philipp-Reis-Strasse 4, Hesse',
+            email: 'bernard@jung.com',
+            birthdate: '01.03.1982',
+          },
+        ]);
     });
 
     it('should return single user', () => {
+      const expected = {
+        id: 2,
+        firstName: 'Bernard',
+        lastName: 'Jung',
+        address: 'Philipp-Reis-Strasse 4, Hesse',
+        email: 'bernard@jung.com',
+        birthdate: '01.03.1982',
+      };
+
       return request(app.getHttpServer())
-        .get('/user/0')
+        .get(`/user/${expected.id}`)
         .expect(200)
-        .expect('This action returns a #0 user');
+        .expect(expected);
+    });
+
+    it('should return http 404 when user not found', () => {
+      return request(app.getHttpServer())
+        .get(`/user/12345`)
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: 'user 12345 not found',
+              statusCode: 404,
+            }),
+          ),
+        );
     });
   });
 

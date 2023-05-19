@@ -23,11 +23,13 @@ export class UserService {
   }
 
   findAll() {
-    return `This action returns all user`;
+    return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) throw new NotFoundException(`user ${id} not found`);
+    return user;
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

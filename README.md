@@ -40,3 +40,11 @@ yarn test:cov
 
 ## roadmap
 ref: [todo](TODO.md)
+
+
+## misc
+
+db dump
+```bash
+docker exec obi--03--user-management--backend-database-1 /usr/bin/mysqldump -u root --password=root devdb > backup.sql
+```
