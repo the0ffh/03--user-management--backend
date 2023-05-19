@@ -8,9 +8,9 @@ export const dataSourceOptions: DataSourceOptions = {
   database: 'devdb',
   username: 'dev',
   password: 'devpw',
-  entities: [path.join(__dirname, 'src/**/*.entity.ts')],
+  entities: [path.join(__dirname, '../src/**/*.entity.ts')],
   synchronize: false,
-  migrations: [path.join(__dirname, 'migration/**/*.ts')],
+  migrations: [path.join(__dirname, '../migration/**/*.ts')],
 };
 
 export const dataSource = new DataSource(dataSourceOptions);

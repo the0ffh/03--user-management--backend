@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { dataSourceOptions } from '../data-source';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import process from 'process';
 import * as path from 'path';
 
 /*

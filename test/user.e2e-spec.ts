@@ -22,23 +22,7 @@ describe('UserController (e2e)', () => {
     await app.close();
   });
 
-  describe('/ (GET)', () => {
-    it('should return all users', () => {
-      return request(app.getHttpServer())
-        .get('/user')
-        .expect(200)
-        .expect('This action returns all user');
-    });
-
-    it('should return single user', () => {
-      return request(app.getHttpServer())
-        .get('/user/0')
-        .expect(200)
-        .expect('This action returns a #0 user');
-    });
-  });
-
-  describe('/ (POST)', () => {
+  describe.only('/ (POST)', () => {
     it('should not create a user with no payload', () => {
       return request(app.getHttpServer())
         .post('/user')
@@ -59,6 +43,21 @@ describe('UserController (e2e)', () => {
           ],
           error: 'Bad Request',
         });
+    });
+
+    it('should create a user', () => {
+      const payload: CreateUserDto = {
+        address: 'Messedamm 59, Dresden',
+        birthdate: '01.02.1980',
+        email: 'john@doe.com',
+        firstName: 'john',
+        lastName: 'doe',
+      };
+
+      return request(app.getHttpServer())
+        .post('/user')
+        .send(payload)
+        .expect(201);
     });
 
     it('should not create a user with extra payload properties', () => {
@@ -83,20 +82,42 @@ describe('UserController (e2e)', () => {
         );
     });
 
-    it('should create a user', () => {
+    it('should not create a user with taken email', () => {
       const payload: CreateUserDto = {
-        address: 'la street 1234',
-        birthdate: '01.01.1900',
-        email: 'adam@test.com',
-        firstName: 'adam',
-        lastName: 'sandler',
+        address: 'Messedamm 59, Dresden',
+        birthdate: '01.02.1980',
+        email: 'john@doe.com',
+        firstName: 'john',
+        lastName: 'doe',
       };
 
       return request(app.getHttpServer())
         .post('/user')
         .send(payload)
-        .expect(201)
-        .expect('This action adds a new user');
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: 'user with provided email exists',
+              statusCode: 409,
+            }),
+          ),
+        );
+    });
+  });
+
+  describe('/ (GET)', () => {
+    it('should return all users', () => {
+      return request(app.getHttpServer())
+        .get('/user')
+        .expect(200)
+        .expect('This action returns all user');
+    });
+
+    it('should return single user', () => {
+      return request(app.getHttpServer())
+        .get('/user/0')
+        .expect(200)
+        .expect('This action returns a #0 user');
     });
   });
 
