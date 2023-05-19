@@ -1,0 +1,7 @@
+- [x] husky / lint-staged
+- [ ] codecov
+- [ ] finish docker-compose.yml
+- [ ] github actions
+  - [ ] deploy on aws / locally (vagrant?)
+- [ ] playwright
+- [ ] switch to mono repo?
