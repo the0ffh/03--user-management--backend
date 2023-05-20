@@ -46,5 +46,5 @@ ref: [todo](TODO.md)
 
 db dump
 ```bash
-docker exec obi--03--user-management--backend-database-1 /usr/bin/mysqldump -u root --password=root devdb > backup.sql
+docker exec 03--user-management--backend-database-1 /usr/bin/mysqldump -u root --password=root devdb > backup.sql
 ```
