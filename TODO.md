@@ -7,13 +7,9 @@
 - [ ] playwright
   - [ ] finish docker-compose.yml
 - [ ] switch to mono repo?
-- [ ] lint
-  - [ ] throw on TODO
-  - [ ] throw on unused vars
-  - [x] throw on console.log
-- [ ] extract address into own table
-- [ ] use date type for birthdate
-- [ ] fix env loading!!!!
+- [ ] ** extract address into own table
+- [ ] ** use date type for birthdate
+- [ ] *fix env loading!!!!
 - [ ] set up logger
 - [ ] spin up test db for each test/suite/file
 - [ ] add fixtures *.sql seed db -> docker instead of mounting db dir
