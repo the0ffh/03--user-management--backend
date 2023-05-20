@@ -11,8 +11,8 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ReadUserDto } from './dto/read-user.dto';
 
 @Controller('user')
 @ApiTags('user')
@@ -37,21 +37,21 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'return all users',
-    type: User,
+    type: ReadUserDto,
     isArray: true,
   })
   @Get()
-  findAll() {
+  findAll(): Promise<ReadUserDto[]> {
     return this.userService.findAll();
   }
 
   @ApiResponse({
     status: 200,
     description: 'return user',
-    type: User,
+    type: ReadUserDto,
   })
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: number): Promise<ReadUserDto> {
     return this.userService.findOne(+id);
   }
 
