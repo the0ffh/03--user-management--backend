@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
+
+  async create(createUserDto: CreateUserDto) {
+    if (!(await this.userRepository.findOneBy({ email: createUserDto.email })))
+      return this.userRepository.save(createUserDto);
+    throw new ConflictException('user with provided email exists');
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll() {
+    const users = await this.userRepository.find();
+    if (users.length) return users;
+    throw new NotFoundException('no users found');
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (user) return user;
+    throw new NotFoundException(`user ${id} not found`);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      await this.userRepository.update(id, updateUserDto);
+      return `successfully updated user ${id}`;
+    } catch (error) {
+      throw new UnprocessableEntityException(`cannot update user ${id}`);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    if (await this.userRepository.findOneBy({ id })) {
+      await this.userRepository.delete({ id });
+      return `successfully deleted user ${id}`;
+    }
+    throw new NotFoundException(`user ${id} not found`);
   }
 }

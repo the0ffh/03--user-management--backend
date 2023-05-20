@@ -1,9 +1,18 @@
 - [x] husky / lint-staged
 - [ ] codecov
-- [ ] finish docker-compose.yml
 - [ ] github actions
   - [x] workflow:pr 
-  - [ ] yarn cache 
-  - [ ] deploy on aws / locally (vagrant?)
+  - [x] yarn cache 
+  - [ ] deploy on e.g. aws upon merge with dev
 - [ ] playwright
+  - [ ] finish docker-compose.yml
 - [ ] switch to mono repo?
+- [ ] ** extract address into own table
+- [ ] ** use date type for birthdate
+- [ ] *fix env loading!!!!
+- [ ] set up logger
+- [ ] spin up test db for each test/suite/file
+- [ ] add fixtures *.sql seed db -> docker instead of mounting db dir
+- [ ] tests: use faker 
+- [ ] e2e: fix'em!!
+- [x] openapi / swagger

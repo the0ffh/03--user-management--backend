@@ -22,22 +22,6 @@ describe('UserController (e2e)', () => {
     await app.close();
   });
 
-  describe('/ (GET)', () => {
-    it('should return all users', () => {
-      return request(app.getHttpServer())
-        .get('/user')
-        .expect(200)
-        .expect('This action returns all user');
-    });
-
-    it('should return single user', () => {
-      return request(app.getHttpServer())
-        .get('/user/0')
-        .expect(200)
-        .expect('This action returns a #0 user');
-    });
-  });
-
   describe('/ (POST)', () => {
     it('should not create a user with no payload', () => {
       return request(app.getHttpServer())
@@ -59,6 +43,21 @@ describe('UserController (e2e)', () => {
           ],
           error: 'Bad Request',
         });
+    });
+
+    it('should create a user', () => {
+      const payload: CreateUserDto = {
+        address: 'Messedamm 59, Dresden',
+        birthdate: '01.02.1980',
+        email: 'john@doe.com',
+        firstName: 'john',
+        lastName: 'doe',
+      };
+
+      return request(app.getHttpServer())
+        .post('/user')
+        .send(payload)
+        .expect(201);
     });
 
     it('should not create a user with extra payload properties', () => {
@@ -83,20 +82,81 @@ describe('UserController (e2e)', () => {
         );
     });
 
-    it('should create a user', () => {
+    it('should not create a user with taken email', () => {
       const payload: CreateUserDto = {
-        address: 'la street 1234',
-        birthdate: '01.01.1900',
-        email: 'adam@test.com',
-        firstName: 'adam',
-        lastName: 'sandler',
+        address: 'Messedamm 59, Dresden',
+        birthdate: '01.02.1980',
+        email: 'john@doe.com',
+        firstName: 'john',
+        lastName: 'doe',
       };
 
       return request(app.getHttpServer())
         .post('/user')
         .send(payload)
-        .expect(201)
-        .expect('This action adds a new user');
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: 'user with provided email exists',
+              statusCode: 409,
+            }),
+          ),
+        );
+    });
+  });
+
+  describe('/ (GET)', () => {
+    it('should return all users', () => {
+      return request(app.getHttpServer())
+        .get('/user')
+        .expect(200)
+        .expect([
+          {
+            id: 1,
+            firstName: 'john',
+            lastName: 'doe',
+            address: 'Messedamm 59, Dresden',
+            email: 'john@doe.com',
+            birthdate: '01.02.1980',
+          },
+          {
+            id: 2,
+            firstName: 'Bernard',
+            lastName: 'Jung',
+            address: 'Philipp-Reis-Strasse 4, Hesse',
+            email: 'bernard@jung.com',
+            birthdate: '01.03.1982',
+          },
+        ]);
+    });
+
+    it('should return single user', () => {
+      const expected = {
+        id: 2,
+        firstName: 'Bernard',
+        lastName: 'Jung',
+        address: 'Philipp-Reis-Strasse 4, Hesse',
+        email: 'bernard@jung.com',
+        birthdate: '01.03.1982',
+      };
+
+      return request(app.getHttpServer())
+        .get(`/user/${expected.id}`)
+        .expect(200)
+        .expect(expected);
+    });
+
+    it('should return http 404 when user not found', () => {
+      return request(app.getHttpServer())
+        .get(`/user/12345`)
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: 'user 12345 not found',
+              statusCode: 404,
+            }),
+          ),
+        );
     });
   });
 
@@ -114,7 +174,7 @@ describe('UserController (e2e)', () => {
         .patch('/user/1')
         .send(payload)
         .expect(200)
-        .expect('This action updates a #1 user');
+        .expect('successfully updated user 1');
     });
 
     it('should not update a user with extra payload properties', async () => {
@@ -141,8 +201,8 @@ describe('UserController (e2e)', () => {
 
     it('should not update a user with malformed email', async () => {
       const payload: UpdateUserDto = {
-        address: 'la street 1234',
-        birthdate: '01.01.1900',
+        address: 'wall street 2000',
+        birthdate: '01.01.2000',
         email: 'adam@te@st.com',
         firstName: 'adam',
         lastName: 'sandler',
@@ -161,11 +221,24 @@ describe('UserController (e2e)', () => {
   });
 
   describe('/ (DELETE)', () => {
-    it('should delete a user', () => {
+    it('should return http 404 when user not found', () => {
       return request(app.getHttpServer())
-        .delete('/user/1')
+        .delete('/user/54321')
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: 'user 54321 not found',
+              statusCode: 404,
+            }),
+          ),
+        );
+    });
+
+    it('should delete a user', async () => {
+      return request(app.getHttpServer())
+        .delete('/user/4')
         .expect(200)
-        .expect('This action removes a #1 user');
+        .expect('successfully deleted user 4');
     });
   });
 });
