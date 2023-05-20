@@ -22,9 +22,9 @@ jobs:
       - run: yarn test:cov
 
   test-e2e:
-#    needs: [test]
+    needs: [test]
     runs-on: ubuntu-22.04
-    timeout-minutes: 3
+    timeout-minutes: 5
     services:
       mysql:
         image: bitnami/mysql
@@ -46,4 +46,5 @@ jobs:
           node-version: 'v18.14.1'
           cache: 'yarn'
       - run: yarn
+      - run: yarn migration:run
       - run: yarn test:e2e
