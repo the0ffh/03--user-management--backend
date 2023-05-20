@@ -1,5 +1,5 @@
-import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -16,17 +16,23 @@ async function bootstrap() {
 
   const swaggerDocument = SwaggerModule.createDocument(app, config);
 
-  app.use('/api.json', (req, res) => res.send(swaggerDocument));
+  app.use('/openapi', (req, res) => res.send(swaggerDocument));
 
   SwaggerModule.setup('api', app, swaggerDocument);
 
   await app.listen(3000);
-  // eslint-disable-next-line no-console
-  console.log('running @ http://localhost:3000');
-  // eslint-disable-next-line no-console
-  console.log('api docs @ http://localhost:3000/api');
-  // eslint-disable-next-line no-console
-  console.log('openapi @ http://localhost:3000/api.json');
 }
 
-bootstrap();
+bootstrap()
+  .then(() => {
+    // eslint-disable-next-line no-console
+    console.log('running @ http://localhost:3000');
+    // eslint-disable-next-line no-console
+    console.log('api docs @ http://localhost:3000/api');
+    // eslint-disable-next-line no-console
+    console.log('openapi @ http://localhost:3000/openapi');
+  })
+  .catch((err) => {
+    // eslint-disable-next-line no-console
+    console.error(err);
+  });
