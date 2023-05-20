@@ -1,4 +1,4 @@
-# obi--03--user-management--backend
+# 03--user-management--backend
 
 ## set up
 ```bash
