@@ -1,45 +1,29 @@
-import * as mysql from 'mysql2/promise';
+import { DatabaseConnection } from './Database';
 
-const dbTestConfig = {
+const connectionOptions = {
   host: '127.0.0.1',
   password: 'root',
   port: 3306,
   user: 'root',
 };
 
-const executeQuery = async (query: string) => {
-  const connection = await mysql.createConnection(dbTestConfig);
-  connection
-    .execute(query)
-    .then(console.log)
-    .catch(console.error)
-    .finally(() => connection.end());
-};
+export class TestCase {
+  constructor(private databaseName: string) {
+    if (/\s/.test(databaseName))
+      throw Error(`databaseName '${databaseName} contains white space`);
 
-const createDatabase = async (name: string) => {
-  executeQuery(`CREATE DATABASE IF NOT EXISTS ${name}`)
-    .then(console.log)
-    .catch(console.error);
-};
+    this.databaseConnection = new DatabaseConnection(connectionOptions);
+  }
 
-const dropDatabase = async (name: string) => {
-  await executeQuery(`DROP DATABASE ${name}`)
-    .then(console.log)
-    .catch(console.error);
-};
+  public setup = async () =>
+    this.databaseConnection.createDatabase(this.databaseName).then(() => {
+      console.log(`database ${this.databaseName} created`);
+    });
 
-interface Options {
-  dbName: string;
+  public destroy = async () =>
+    this.databaseConnection.dropDatabase(this.databaseName).then(() => {
+      console.log(`database ${this.databaseName} dropped`);
+    });
+
+  private databaseConnection: DatabaseConnection;
 }
-
-export const setupTestCase = async ({ dbName }: Options) => {
-  await createDatabase(dbName).then(() => {
-    console.log(`db ${dbName} created`);
-  });
-};
-
-export const testCaseDestroy = async ({ dbName }: Options) => {
-  await dropDatabase(dbName).then(() => {
-    console.log(`db ${dbName} dropped`);
-  });
-};
