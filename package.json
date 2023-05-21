@@ -90,6 +90,6 @@
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,md,json}": "eslint",
-    "test/**/*.{ts,tsx}": "eslint"
+    "test*/**/*.{ts,tsx}": "eslint"
   }
 }

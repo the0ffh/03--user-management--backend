@@ -1,4 +1,5 @@
 import { DatabaseConnection } from './Database';
+import { faker } from '@faker-js/faker';
 
 const connectionOptions = {
   host: '127.0.0.1',
@@ -8,11 +9,9 @@ const connectionOptions = {
 };
 
 export class TestCase {
-  constructor(private databaseName: string) {
-    if (/\s/.test(databaseName))
-      throw Error(`databaseName '${databaseName} contains white space`);
-
+  constructor() {
     this.databaseConnection = new DatabaseConnection(connectionOptions);
+    this.databaseName = `test_${faker.string.alphanumeric(10)}`;
   }
 
   public setup = async () =>
@@ -25,5 +24,8 @@ export class TestCase {
       console.log(`database ${this.databaseName} dropped`);
     });
 
+  public getDatabaseName = () => this.databaseName;
+
   private databaseConnection: DatabaseConnection;
+  private readonly databaseName: string;
 }

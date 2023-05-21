@@ -5,16 +5,15 @@ export class DatabaseConnection {
   constructor(private connectionOptions: ConnectionOptions) {}
 
   private executeQuery = async (query: string) =>
-    mysql.createConnection(this.connectionOptions).then((connection) =>
-      connection
-        .execute(query)
-        .catch(console.error)
-        .finally(() => connection.end()),
-    );
+    mysql
+      .createConnection(this.connectionOptions)
+      .then((connection) =>
+        connection.execute(query).finally(() => connection.end()),
+      );
 
   public createDatabase = async (name: string) =>
-    this.executeQuery(`CREATE DATABASE ${name}`).catch(console.error);
+    this.executeQuery(`CREATE DATABASE ${name}`);
 
   public dropDatabase = async (name: string) =>
-    this.executeQuery(`DROP DATABASE ${name}`).catch(console.error);
+    this.executeQuery(`DROP DATABASE ${name}`);
 }
