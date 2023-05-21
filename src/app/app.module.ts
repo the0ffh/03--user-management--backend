@@ -3,7 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
-import { dataSourceOptions } from '../data-source';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseConfiguration } from '../database.configuration';
 
 /*
  * ConfigModule + TypeOrmModule cfg
@@ -11,8 +12,9 @@ import { dataSourceOptions } from '../data-source';
  */
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({ ...dataSourceOptions, autoLoadEntities: true }),
+      useClass: DatabaseConfiguration,
     }),
     UserModule,
   ],

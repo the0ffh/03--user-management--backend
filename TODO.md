@@ -16,3 +16,5 @@
 - [ ] tests: use faker 
 - [ ] e2e: fix'em!!
 - [x] openapi / swagger
+- [ ] import {SnakeNamingStrategy} from "typeorm-naming-strategies";
+   ref: https://stackoverflow.com/a/71329227/9180019
