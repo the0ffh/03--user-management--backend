@@ -23,7 +23,7 @@
     "prepack": "pinst --disable",
     "postpack": "pinst --enable",
     "pre-commit": "lint-staged",
-    "typeorm": "typeorm-ts-node-commonjs -d src/data-source.ts",
+    "typeorm": "typeorm-ts-node-commonjs -d dist/config/migration.configuration.js",
     "migration:create": "yarn typeorm migration:create",
     "migration:generate": "yarn typeorm migration:generate",
     "migration:run": "yarn typeorm migration:run --transaction all",

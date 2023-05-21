@@ -9,7 +9,7 @@
 - [ ] switch to mono repo?
 - [ ] ** extract address into own table
 - [ ] ** use date type for birthdate
-- [ ] *fix env loading!!!!
+- [x] *fix env loading!!!!
 - [ ] set up logger
 - [ ] spin up test db for each test/suite/file
 - [ ] add fixtures *.sql seed db -> docker instead of mounting db dir

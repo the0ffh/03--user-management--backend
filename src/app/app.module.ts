@@ -4,12 +4,13 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseConfiguration } from '../database.configuration';
+import { DatabaseConfiguration } from '../../config/database.configuration';
 
 /*
  * ConfigModule + TypeOrmModule cfg
- * ref: https://jaketrent.com/post/configure-typeorm-inject-nestjs-config/
+ * ref: https://stackoverflow.com/a/71329227/9180019
  */
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
