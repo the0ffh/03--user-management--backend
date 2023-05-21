@@ -10,11 +10,11 @@
 - [ ] ** extract address into own table
 - [ ] ** use date type for birthdate
 - [x] *fix env loading!!!!
-- [ ] set up logger
+- [x] set up logger
 - [ ] spin up test db for each test/suite/file
 - [ ] add fixtures *.sql seed db -> docker instead of mounting db dir
-- [ ] tests: use faker 
-- [ ] e2e: fix'em!!
+- [x] tests: use faker 
+- [x] e2e: fix'em!!
 - [x] openapi / swagger
 - [ ] import {SnakeNamingStrategy} from "typeorm-naming-strategies";
    ref: https://stackoverflow.com/a/71329227/9180019
