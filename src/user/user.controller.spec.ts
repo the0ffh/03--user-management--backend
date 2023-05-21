@@ -65,7 +65,7 @@ describe('UserController', () => {
       Promise.resolve([user1, user2, user3]),
     );
 
-    expect(await controller.findAll()).toBe([user1, user2, user3]);
+    expect(await controller.findAll()).toStrictEqual([user1, user2, user3]);
     expect(userServiceMock.findAll).toHaveBeenCalledTimes(1);
     expect(userServiceMock.findAll).toHaveBeenCalledWith();
   });

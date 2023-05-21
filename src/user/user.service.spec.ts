@@ -39,6 +39,10 @@ describe('UserService', () => {
     userService = module.get<UserService>(UserService);
   });
 
+  afterEach(async () => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(userService).toBeDefined();
   });
@@ -223,7 +227,9 @@ describe('UserService', () => {
       userRepositoryMock.findOneBy.mockImplementationOnce(() =>
         Promise.resolve(user1),
       );
-      userRepositoryMock.delete.mockImplementationOnce(() => Promise.resolve());
+      userRepositoryMock.delete.mockImplementationOnce(() =>
+        Promise.resolve({}),
+      );
 
       await expect(userService.remove(user1.id)).rejects.toThrow(
         new UnprocessableEntityException(`failed to delete user ${user1.id}`),
