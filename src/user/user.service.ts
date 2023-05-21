@@ -55,15 +55,15 @@ export class UserService {
   }
 
   async remove(id: number) {
-    if (await this.userRepository.findOneBy({ id })) {
+    if (await this.findOne(id)) {
       const deleteResult = await this.userRepository.delete({ id });
-      if (deleteResult.affected)
+      if (deleteResult.affected) {
         this.logger.log(`successfully deleted user ${id}`);
-      else {
+        return id;
+      } else {
         this.logger.error(`failed to delete user ${id}`);
         throw new UnprocessableEntityException(`failed to delete user ${id}`);
       }
-    }
-    throw new NotFoundException(`user ${id} not found`);
+    } else throw new NotFoundException(`user ${id} not found`);
   }
 }

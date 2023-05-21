@@ -46,15 +46,16 @@ describe('UserController (e2e)', () => {
     it('should return all users', () => {
       const user1 = createUser();
       const user2 = createUser();
+      const user3 = createUser();
 
       userServiceMock.findAll.mockImplementationOnce(() =>
-        Promise.resolve([user1, user2]),
+        Promise.resolve([user1, user2, user3]),
       );
 
       return request(app.getHttpServer())
         .get('/user')
         .expect(200)
-        .expect([user1, user2]);
+        .expect([user1, user2, user3]);
     });
 
     it('should return single user', () => {
@@ -151,6 +152,37 @@ describe('UserController (e2e)', () => {
         .patch(`/user/${user1.id}`)
         .send(user1)
         .expect(200);
+    });
+
+    it('should not update a user with extra payload properties', async () => {
+      const user1 = createUser();
+
+      return request(app.getHttpServer())
+        .patch('/user/1')
+        .send(user1)
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: ['property id should not exist'],
+              statusCode: 400,
+            }),
+          ),
+        );
+    });
+    it('should not update a user with malformed email', async () => {
+      const user1 = createUser();
+      user1.email = 'adam@adam@test.om';
+      delete user1['id'];
+
+      return request(app.getHttpServer())
+        .patch('/user/1')
+        .send(user1)
+        .expect(400)
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({ message: ['email must be an email'] }),
+          ),
+        );
     });
   });
 
