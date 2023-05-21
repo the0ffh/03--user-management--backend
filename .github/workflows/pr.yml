@@ -45,5 +45,6 @@ jobs:
           node-version: 'v18.14.1'
           cache: 'yarn'
       - run: yarn
+      - run: yarn build
       - run: yarn migration:run
       - run: yarn test:e2e

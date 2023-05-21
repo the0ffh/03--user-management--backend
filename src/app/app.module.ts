@@ -3,16 +3,19 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from '../user/user.module';
-import { dataSourceOptions } from '../data-source';
+import { ConfigModule } from '@nestjs/config';
+import { DatabaseConfiguration } from '../../config/database.configuration';
 
 /*
  * ConfigModule + TypeOrmModule cfg
- * ref: https://jaketrent.com/post/configure-typeorm-inject-nestjs-config/
+ * ref: https://stackoverflow.com/a/71329227/9180019
  */
+
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
-      useFactory: () => ({ ...dataSourceOptions, autoLoadEntities: true }),
+      useClass: DatabaseConfiguration,
     }),
     UserModule,
   ],
