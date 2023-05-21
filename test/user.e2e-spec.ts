@@ -15,23 +15,23 @@ const createUser = () => ({
   birthdate: `${faker.date.birthdate()}`,
 });
 
+const userServiceMock = {
+  create: jest.fn(),
+  findAll: jest.fn(),
+  findOne: jest.fn(),
+  update: jest.fn(),
+  remove: jest.fn(),
+};
+
 describe('UserController (e2e)', () => {
   let app: INestApplication;
-
-  const userService = {
-    create: jest.fn(),
-    findAll: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
-  };
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
       .overrideProvider(UserService)
-      .useValue(userService)
+      .useValue(userServiceMock)
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -47,7 +47,7 @@ describe('UserController (e2e)', () => {
       const user1 = createUser();
       const user2 = createUser();
 
-      userService.findAll.mockImplementationOnce(() =>
+      userServiceMock.findAll.mockImplementationOnce(() =>
         Promise.resolve([user1, user2]),
       );
 
@@ -60,7 +60,9 @@ describe('UserController (e2e)', () => {
     it('should return single user', () => {
       const user1 = createUser();
 
-      userService.findOne.mockImplementationOnce(() => Promise.resolve(user1));
+      userServiceMock.findOne.mockImplementationOnce(() =>
+        Promise.resolve(user1),
+      );
 
       return request(app.getHttpServer())
         .get(`/user/${user1.id}`)
@@ -69,7 +71,7 @@ describe('UserController (e2e)', () => {
     });
 
     it('should return http 404 when user not found', () => {
-      userService.findOne.mockImplementationOnce(() =>
+      userServiceMock.findOne.mockImplementationOnce(() =>
         Promise.reject(new NotFoundException('user 12345 not found')),
       );
 
@@ -129,7 +131,7 @@ describe('UserController (e2e)', () => {
       const user1 = createUser();
       delete user1['id'];
 
-      userService.create.mockImplementationOnce(() => Promise.resolve(1));
+      userServiceMock.create.mockImplementationOnce(() => Promise.resolve(1));
 
       return request(app.getHttpServer()).post('/user').send(user1).expect(201);
     });
@@ -138,10 +140,12 @@ describe('UserController (e2e)', () => {
   describe('/ (PATCH)', () => {
     it('should update a user', () => {
       const user1 = createUser();
-      userService.findOne.mockImplementationOnce(() => Promise.resolve(user1));
+      userServiceMock.findOne.mockImplementationOnce(() =>
+        Promise.resolve(user1),
+      );
 
       delete user1['id'];
-      userService.update.mockImplementationOnce(() => Promise.resolve());
+      userServiceMock.update.mockImplementationOnce(() => Promise.resolve());
 
       return request(app.getHttpServer())
         .patch(`/user/${user1.id}`)
@@ -153,7 +157,9 @@ describe('UserController (e2e)', () => {
   describe('/ (DELETE)', () => {
     it('should delete a user', async () => {
       const user1 = createUser();
-      userService.findOne.mockImplementationOnce(() => Promise.resolve(user1));
+      userServiceMock.findOne.mockImplementationOnce(() =>
+        Promise.resolve(user1),
+      );
 
       return request(app.getHttpServer())
         .delete(`/user/${user1.id}`)

@@ -12,9 +12,9 @@ export class DatabaseConfiguration implements TypeOrmOptionsFactory {
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
 
-      entities: [path.join(__dirname, '../src/**/*.entity.ts')],
+      entities: [path.join(__dirname, '../src/**/*.entity.{js,ts}')],
       synchronize: false,
-      migrations: [path.join(__dirname, '../migration/**/*.ts')],
+      migrations: [path.join(__dirname, '../migration/**/*.{js,ts}')],
     };
   }
 }
