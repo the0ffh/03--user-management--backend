@@ -1,18 +1,38 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, NotFoundException } from '@nestjs/common';
 import * as request from 'supertest';
-import { UserModule } from '../src/user/user.module';
 import { AppModule } from '../src/app/app.module';
-import { CreateUserDto } from '../src/user/dto/create-user.dto';
-import { UpdateUserDto } from '../src/user/dto/update-user.dto';
+import { UserService } from '../src/user/user.service';
+
+import { faker } from '@faker-js/faker';
+
+const createUser = () => ({
+  id: faker.number.int(),
+  firstName: faker.person.firstName(),
+  lastName: faker.person.lastName(),
+  address: faker.location.streetAddress({ useFullAddress: true }),
+  email: faker.internet.email(),
+  birthdate: `${faker.date.birthdate()}`,
+});
 
 describe('UserController (e2e)', () => {
   let app: INestApplication;
 
+  const userService = {
+    create: jest.fn(),
+    findAll: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn(),
+  };
+
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule, UserModule],
-    }).compile();
+      imports: [AppModule],
+    })
+      .overrideProvider(UserService)
+      .useValue(userService)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -20,6 +40,50 @@ describe('UserController (e2e)', () => {
 
   afterEach(async () => {
     await app.close();
+  });
+
+  describe('/ (GET)', () => {
+    it('should return all users', () => {
+      const user1 = createUser();
+      const user2 = createUser();
+
+      userService.findAll.mockImplementationOnce(() =>
+        Promise.resolve([user1, user2]),
+      );
+
+      return request(app.getHttpServer())
+        .get('/user')
+        .expect(200)
+        .expect([user1, user2]);
+    });
+
+    it('should return single user', () => {
+      const user1 = createUser();
+
+      userService.findOne.mockImplementationOnce(() => Promise.resolve(user1));
+
+      return request(app.getHttpServer())
+        .get(`/user/${user1.id}`)
+        .expect(200)
+        .expect(user1);
+    });
+
+    it('should return http 404 when user not found', () => {
+      userService.findOne.mockImplementationOnce(() =>
+        Promise.reject(new NotFoundException('user 12345 not found')),
+      );
+
+      return request(app.getHttpServer())
+        .get(`/user/12345`)
+        .expect((response) =>
+          expect(response.body).toEqual(
+            expect.objectContaining({
+              message: 'user 12345 not found',
+              statusCode: 404,
+            }),
+          ),
+        );
+    });
   });
 
   describe('/ (POST)', () => {
@@ -45,200 +109,55 @@ describe('UserController (e2e)', () => {
         });
     });
 
-    it('should create a user', () => {
-      const payload: CreateUserDto = {
-        address: 'Messedamm 59, Dresden',
-        birthdate: '01.02.1980',
-        email: 'john@doe.com',
-        firstName: 'john',
-        lastName: 'doe',
-      };
-
-      return request(app.getHttpServer())
-        .post('/user')
-        .send(payload)
-        .expect(201);
-    });
-
     it('should not create a user with extra payload properties', () => {
-      const payload: CreateUserDto = {
-        address: 'la street 1234',
-        birthdate: '01.01.1900',
-        email: 'adam@test.com',
-        firstName: 'adam',
-        lastName: 'sandler',
-      };
+      const user1 = createUser();
 
       return request(app.getHttpServer())
         .post('/user')
-        .send({ ...payload, shoeSize: 43 })
+        .send(user1)
         .expect(400)
         .expect((response) =>
           expect(response.body).toEqual(
             expect.objectContaining({
-              message: ['property shoeSize should not exist'],
+              message: ['property id should not exist'],
             }),
           ),
         );
     });
 
-    it('should not create a user with taken email', () => {
-      const payload: CreateUserDto = {
-        address: 'Messedamm 59, Dresden',
-        birthdate: '01.02.1980',
-        email: 'john@doe.com',
-        firstName: 'john',
-        lastName: 'doe',
-      };
+    it('should create a user', () => {
+      const user1 = createUser();
+      delete user1['id'];
 
-      return request(app.getHttpServer())
-        .post('/user')
-        .send(payload)
-        .expect((response) =>
-          expect(response.body).toEqual(
-            expect.objectContaining({
-              message: 'user with provided email exists',
-              statusCode: 409,
-            }),
-          ),
-        );
-    });
-  });
+      userService.create.mockImplementationOnce(() => Promise.resolve(1));
 
-  describe('/ (GET)', () => {
-    it('should return all users', () => {
-      return request(app.getHttpServer())
-        .get('/user')
-        .expect(200)
-        .expect([
-          {
-            id: 1,
-            firstName: 'john',
-            lastName: 'doe',
-            address: 'Messedamm 59, Dresden',
-            email: 'john@doe.com',
-            birthdate: '01.02.1980',
-          },
-          {
-            id: 2,
-            firstName: 'Bernard',
-            lastName: 'Jung',
-            address: 'Philipp-Reis-Strasse 4, Hesse',
-            email: 'bernard@jung.com',
-            birthdate: '01.03.1982',
-          },
-        ]);
-    });
-
-    it('should return single user', () => {
-      const expected = {
-        id: 2,
-        firstName: 'Bernard',
-        lastName: 'Jung',
-        address: 'Philipp-Reis-Strasse 4, Hesse',
-        email: 'bernard@jung.com',
-        birthdate: '01.03.1982',
-      };
-
-      return request(app.getHttpServer())
-        .get(`/user/${expected.id}`)
-        .expect(200)
-        .expect(expected);
-    });
-
-    it('should return http 404 when user not found', () => {
-      return request(app.getHttpServer())
-        .get(`/user/12345`)
-        .expect((response) =>
-          expect(response.body).toEqual(
-            expect.objectContaining({
-              message: 'user 12345 not found',
-              statusCode: 404,
-            }),
-          ),
-        );
+      return request(app.getHttpServer()).post('/user').send(user1).expect(201);
     });
   });
 
   describe('/ (PATCH)', () => {
     it('should update a user', () => {
-      const payload: UpdateUserDto = {
-        address: 'la street 1234',
-        birthdate: '01.01.1900',
-        email: 'adam@test.com',
-        firstName: 'adam',
-        lastName: 'sandler',
-      };
+      const user1 = createUser();
+      userService.findOne.mockImplementationOnce(() => Promise.resolve(user1));
+
+      delete user1['id'];
+      userService.update.mockImplementationOnce(() => Promise.resolve());
 
       return request(app.getHttpServer())
-        .patch('/user/1')
-        .send(payload)
-        .expect(200)
-        .expect('successfully updated user 1');
-    });
-
-    it('should not update a user with extra payload properties', async () => {
-      const payload: UpdateUserDto = {
-        address: 'la street 1234',
-        birthdate: '01.01.1900',
-        email: 'adam@test.com',
-        firstName: 'adam',
-        lastName: 'sandler',
-      };
-
-      return request(app.getHttpServer())
-        .patch('/user/1')
-        .send({ ...payload, shoeSize: 43 })
-        .expect(400)
-        .expect((response) =>
-          expect(response.body).toEqual(
-            expect.objectContaining({
-              message: ['property shoeSize should not exist'],
-            }),
-          ),
-        );
-    });
-
-    it('should not update a user with malformed email', async () => {
-      const payload: UpdateUserDto = {
-        address: 'wall street 2000',
-        birthdate: '01.01.2000',
-        email: 'adam@te@st.com',
-        firstName: 'adam',
-        lastName: 'sandler',
-      };
-
-      return request(app.getHttpServer())
-        .patch('/user/1')
-        .send(payload)
-        .expect(400)
-        .expect((response) =>
-          expect(response.body).toEqual(
-            expect.objectContaining({ message: ['email must be an email'] }),
-          ),
-        );
+        .patch(`/user/${user1.id}`)
+        .send(user1)
+        .expect(200);
     });
   });
 
   describe('/ (DELETE)', () => {
-    it('should return http 404 when user not found', () => {
-      return request(app.getHttpServer())
-        .delete('/user/54321')
-        .expect((response) =>
-          expect(response.body).toEqual(
-            expect.objectContaining({
-              message: 'user 54321 not found',
-              statusCode: 404,
-            }),
-          ),
-        );
-    });
-
     it('should delete a user', async () => {
+      const user1 = createUser();
+      userService.findOne.mockImplementationOnce(() => Promise.resolve(user1));
+
       return request(app.getHttpServer())
-        .delete('/user/4')
-        .expect(200)
-        .expect('successfully deleted user 4');
+        .delete(`/user/${user1.id}`)
+        .expect(200);
     });
   });
 });

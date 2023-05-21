@@ -6,7 +6,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     abortOnError: false,
     cors: true,
+    logger: ['debug', 'error', 'log', 'verbose', 'warn'],
   });
+
+  const port = process.env.SERVER_PORT;
+  const apiPath = process.env.SERVER_API_PATH;
+  const openApiPath = process.env.SERVER_OPENAPI_PATH;
 
   const config = new DocumentBuilder()
     .setTitle('User Management API')
@@ -16,23 +21,18 @@ async function bootstrap() {
 
   const swaggerDocument = SwaggerModule.createDocument(app, config);
 
-  app.use('/openapi', (req, res) => res.send(swaggerDocument));
+  app.use(`/${openApiPath}`, (req, res) => res.send(swaggerDocument));
 
-  SwaggerModule.setup('api', app, swaggerDocument);
+  SwaggerModule.setup(apiPath, app, swaggerDocument);
 
-  await app.listen(3000);
+  await app.listen(port);
+
+  console.log(`
+  running @ http://localhost:${port}
+  api docs @ http://localhost:${port}/${apiPath}
+  openapi @ http://localhost:${port}/${openApiPath}`);
 }
 
-bootstrap()
-  .then(() => {
-    // eslint-disable-next-line no-console
-    console.log('running @ http://localhost:3000');
-    // eslint-disable-next-line no-console
-    console.log('api docs @ http://localhost:3000/api');
-    // eslint-disable-next-line no-console
-    console.log('openapi @ http://localhost:3000/openapi');
-  })
-  .catch((err) => {
-    // eslint-disable-next-line no-console
-    console.error(err);
-  });
+bootstrap().catch((err) => {
+  console.error(err);
+});
