@@ -21,8 +21,8 @@ services:
   backend:
     depends_on:
       - database
-#    image: the0ffh/03-user-management-backend:0.0.4
     build: .
+    entrypoint: 'sh -c "yarn migration:run && yarn start:prod"'
     environment:
       NODE_ENV: 'development'
       MYSQL_DATABASE: devdb
