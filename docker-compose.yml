@@ -16,4 +16,20 @@ services:
       - ./database:/var/lib/mysql:r
     user: '501'
 
-# user: $UID - use with colima in order to utilize volume mounts
+  backend:
+    image: the0ffh/03-user-management-backend:0.0.1
+    environment:
+      NODE_ENV: 'development'
+      MYSQL_DATABASE: devdb
+      MYSQL_DATABASE_HOST: database
+      MYSQL_DATABASE_PORT: 3306
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: devpw
+      MYSQL_ROOT_PASSWORD: root
+      SERVER_PORT: 3000
+      SERVER_API_PATH: path
+      SERVER_OPENAPI_PATH: openapi
+    ports:
+      - 3000:3000
+    depends_on:
+      - database
