@@ -17,6 +17,7 @@ services:
     user: '501'
     networks:
       - 03--user-management
+  # user: $UID - use with colima in order to utilize volume mounts
 
   backend:
     depends_on:
